@@ -4,9 +4,9 @@ class User
 {
 
   int? Id;
-  String? Name;
-  String? Email;
-  String? Password;
-  Image? Photo;
+  String name ='';
+  String email= '';
+  String password = '';
+  Image? photo;
 
 }
