@@ -6,7 +6,7 @@ import 'package:step/pages/Quest.dart';
 
 void main() => runApp(MaterialApp(
   theme: ThemeData(primaryColor: Colors.orange),
-  initialRoute: '/Registr',
+  initialRoute: '/Hub',
   routes: {
     '/Registr': (context) => Registr(),
     '/Authoriz': (context) => Authoriz(),

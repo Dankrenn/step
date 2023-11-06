@@ -91,6 +91,17 @@ class _AuthorizState extends State<Authoriz> {
                       ),
                     ),
                   ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil (context, '/Registr', (route) => true);
+                    },
+                    child: Text(
+                      'Еще нет аккаунта?',
+                      style: TextStyle(
+                        color: Colors.blueAccent,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],

@@ -134,17 +134,6 @@ class _RegistrState extends State<Registr> {
                 ),
               ),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamedAndRemoveUntil (context, '/Authoriz', (route) => true);
-              },
-              child: Text(
-                'Еще нет аккаунта? Войти',
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                ),
-              ),
-            ),
           ],
         ),
       ),
