@@ -1,68 +1,68 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../classes/User.dart';
 import '../classes/EmailValidator.dart';
 
 
-class Registr extends StatefulWidget {
-  const Registr({Key? key});
-
+class RegistrationScreen extends StatefulWidget {
   @override
-  _RegistrState createState() => _RegistrState();
+  _RegistrationScreenState createState() => _RegistrationScreenState();
 }
 
-class _RegistrState extends State<Registr> {
-  final user = User();
-  String confirmPassword = '';
-  bool isEmailValid = true;
+class _RegistrationScreenState extends State<RegistrationScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final UserApp _user = UserApp();
+
+  bool _isEmailValid = true;
+  String _confirmPassword = '';
 
   bool validateEmail(String email) {
     return EmailValidator.validate(email);
   }
 
-  void register(BuildContext context) {
-    if (user.name.isEmpty || user.email.isEmpty || user.password.isEmpty || confirmPassword.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-    content: Text(
-    'Ошибка: Заполните все поля!',
-    style: TextStyle(fontSize: 20, color: Colors.red),
-    ),
-    duration: Duration(seconds: 5),
-    ),
-    );
-    } else if (user.password != confirmPassword) {
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-    content: Text(
-    'Ошибка: Пароли не совпадают!',
-    style: TextStyle(fontSize: 20, color: Colors.red),
-    ),
-    duration: Duration(seconds: 5),
-    ),
-    );
-    } else if (!isEmailValid) {
-    ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-    content: Text(
-    'Ошибка: Неправильный формат email!',
-    style: TextStyle(fontSize: 20, color: Colors.red),
-    ),
-    duration: Duration(seconds: 5),
-    ),
-    );
+  void _registerUser(BuildContext context) async {
+    if (_user.password != _confirmPassword) {
+      _showSnackBar(context, 'Ошибка: Пароли не совпадают!');
+    } else if (!_isEmailValid) {
+      _showSnackBar(context, 'Ошибка: Неправильный формат email!');
     } else {
-      Navigator.pushNamedAndRemoveUntil (context, '/Quest', (route) => true);
-    // Продолжайте с регистрацией пользователя
-    // ...
+      try {
+        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+          email: _user.email,
+          password: _user.password,
+        );
+
+        User? firebaseUser = userCredential.user;
+        if (firebaseUser != null) {
+          await firebaseUser.updateProfile(displayName: _user.name);
+          Navigator.pushNamedAndRemoveUntil(context, '/Quest', (route) => true);
+        }
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          _showSnackBar(context, 'Ошибка: Слишком слабый пароль!');
+        } else if (e.code == 'email-already-in-use') {
+          _showSnackBar(context, 'Ошибка: Учетная запись уже существует для этого email!');
+        }
+      } catch (e) {
+      }
     }
   }
 
-
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(fontSize: 20, color: Colors.red),
+        ),
+        duration: Duration(seconds: 5),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(8, 70, 162, 1),
       appBar: AppBar(
         title: Text('Регистрация'),
         centerTitle: true,
@@ -73,9 +73,9 @@ class _RegistrState extends State<Registr> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextFormField(
-              onChanged: (String value) {
+              onChanged: (value) {
                 setState(() {
-                  user.name = value;
+                  _user.name = value;
                 });
               },
               decoration: InputDecoration(
@@ -85,22 +85,22 @@ class _RegistrState extends State<Registr> {
             SizedBox(height: 16.0),
             TextFormField(
               keyboardType: TextInputType.emailAddress,
-              onChanged: (String value) {
+              onChanged: (value) {
                 setState(() {
-                  user.email = value;
-                  isEmailValid = validateEmail(value);
+                  _user.email = value;
+                  _isEmailValid = validateEmail(value);
                 });
               },
               decoration: InputDecoration(
                 labelText: 'Email',
-                errorText: isEmailValid ? null : 'Неправильный формат email',
+                errorText: _isEmailValid ? null : 'Неправильный формат email',
               ),
             ),
             SizedBox(height: 16.0),
             TextFormField(
-              onChanged: (String value) {
+              onChanged: (value) {
                 setState(() {
-                  user.password = value;
+                  _user.password = value;
                 });
               },
               obscureText: true,
@@ -110,9 +110,9 @@ class _RegistrState extends State<Registr> {
             ),
             SizedBox(height: 16.0),
             TextFormField(
-              onChanged: (String value) {
+              onChanged: (value) {
                 setState(() {
-                  confirmPassword = value;
+                  _confirmPassword = value;
                 });
               },
               obscureText: true,
@@ -122,13 +122,12 @@ class _RegistrState extends State<Registr> {
             ),
             SizedBox(height: 32.0),
             ElevatedButton(
-              onPressed: () => register(context),
+              onPressed: () => _registerUser(context),
               child: Text('Зарегистрироваться'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.black,
                 backgroundColor: Colors.green[600],
-                padding:
-                EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -140,4 +139,5 @@ class _RegistrState extends State<Registr> {
     );
   }
 }
+
 

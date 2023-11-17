@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "561120459383",
+    "project_id": "fir-step-f9a6a",
+    "storage_bucket": "fir-step-f9a6a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561120459383:android:dfe6d34a6397c4d474a472",
+        "android_client_info": {
+          "package_name": "com.example.step"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnlO92AZQXwr1pOJfgN75TpO27tF8jEKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

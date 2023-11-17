@@ -1,38 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class Authoriz extends StatefulWidget {
-  const Authoriz({Key? key}) : super(key: key);
+class AuthorizationScreen extends StatefulWidget {
+  const AuthorizationScreen({Key? key}) : super(key: key);
 
   @override
   _AuthorizState createState() => _AuthorizState();
 }
 
-class _AuthorizState extends State<Authoriz> {
-  String email = '';
-  String password = '';
+class _AuthorizState extends State<AuthorizationScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  late String email;
+  late String password;
 
-  void login(BuildContext context) {
-    // Проверка пользователя
-    if (email == 'daniilruzenko@gmail.com' && password == '1') {
-      Navigator.pushNamedAndRemoveUntil(context, '/Hub', (route) => true);
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Ошибка'),
-            content: Text('Неправильный email или пароль.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
+  void login(BuildContext context) async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
       );
+      // Если аутентификация прошла успешно, переходим на другой экран
+      Navigator.pushNamedAndRemoveUntil(context, '/Hub', (route) => true);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        SnackBar(
+          content: Text(
+            'Неправильный Email или пароль',
+            style: TextStyle(fontSize: 20, color: Colors.red),
+          ),
+          duration: Duration(seconds: 5),
+        );
+      }
     }
   }
 
@@ -44,8 +42,7 @@ class _AuthorizState extends State<Authoriz> {
           title: Text('Авторизация'),
           centerTitle: true,
         ),
-        backgroundColor: Color.fromRGBO(8, 70, 162, 1),
-        body:Padding(
+        body: Padding(
           padding: EdgeInsets.all(22.0),
           child: Column(
             children: [
@@ -84,8 +81,7 @@ class _AuthorizState extends State<Authoriz> {
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.black,
                       backgroundColor: Colors.green[600],
-                      padding:
-                      EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -93,7 +89,8 @@ class _AuthorizState extends State<Authoriz> {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil (context, '/Registr', (route) => true);
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, '/Registr', (route) => true);
                     },
                     child: Text(
                       'Еще нет аккаунта?',

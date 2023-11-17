@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'ChatScreen.dart';
 import 'HomeScreen.dart';
 import 'ProfileScreen.dart';
 class Hub extends StatefulWidget {
@@ -18,11 +18,7 @@ class _HubState extends State<Hub> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color.fromRGBO(8, 70, 162, 1),
-        appBar: AppBar(
-          title: Text('Комплексы'),
-          centerTitle: true,
-        ),
+        backgroundColor: Color.fromRGBO(112, 128, 144, 1),
         body: _tabs[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
@@ -47,15 +43,6 @@ class _HubState extends State<Hub> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class ChatScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Чат пользователей'),
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:step/classes/Question.dart';
 import 'package:flutter/material.dart';
 
@@ -5,22 +7,97 @@ import 'package:flutter/material.dart';
 
 class Quest extends StatefulWidget {
   const Quest({Key? key});
-
   @override
   State<Quest> createState() => _QuestState();
 }
 
 class _QuestState extends State<Quest> {
-  List<Question> listQuestion = [
-    Question(
-      question: 'Вопрос 1',
-      answers: ['Ответ 1', 'Ответ 2', 'Ответ 3'],
-    ),
-    Question(
-      question: 'Вопрос 2',
-      answers: ['Ответ 1', 'Ответ 2', 'Ответ 3'],
-    ),
-  ];
+
+     List<Question> listQuestion = [];
+     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+     @override
+     void initState() {
+       super.initState();
+       bool isUserRegistered = FirebaseAuth.instance.currentUser != null;
+       if (isUserRegistered) {
+         getUserResponses().then((value) {
+               setState(() {
+                 listQuestion = value;
+               });
+             });
+           }
+       else {
+         getquestedFirebase().then((questions) {
+           setState(() {
+             listQuestion = questions;
+           });
+         });
+       }
+     }
+
+       Future<List<Question>> getquestedFirebase() async {
+       List<Question> questions = [];
+       QuerySnapshot querySnapshot = await _firestore.collection('questions').get();
+       querySnapshot.docs.forEach((doc) {
+         var data = doc.data() as Map<String, dynamic>;
+         if (data['question'] != null && data['answers'] != null) {
+           Question question = Question(
+             question: data['question'].toString(),
+             answers: List<String>.from(data['answers'] as List<dynamic>),
+           );
+           questions.add(question);
+         }
+       });
+       return questions;
+     }
+
+     Future<void> saveUserResponses(List<Question> questions) async {
+       String userId = FirebaseAuth.instance.currentUser?.uid ?? 'default_uid';
+       CollectionReference userResponses = _firestore.collection('user_responses').doc(userId).collection('responses');
+
+       for (var question in questions) {
+         await userResponses.doc(question.question).set({
+           'question': question.question,
+           'answers': question.answers,
+           'userAnswerIndex': question.userAnswerIndex,
+         });
+       }
+     }
+
+     Future<List<Question>> getUserResponses() async {
+       String userId = FirebaseAuth.instance.currentUser?.uid ?? 'default_uid';
+       List<Question> userResponses = [];
+
+       // Получение снимка коллекции 'responses' пользователя из Firestore
+       QuerySnapshot responseSnapshot = await FirebaseFirestore.instance
+           .collection('user_responses')
+           .doc(userId)
+           .collection('responses')
+           .get();
+
+       // Обработка каждого документа в снимке
+       responseSnapshot.docs.forEach((doc) {
+         var data = doc.data() as Map<String, dynamic>;
+
+         // Проверка наличия необходимых полей
+         if (data.containsKey('question') &&
+             data.containsKey('answers') &&
+             data.containsKey('userAnswerIndex')) {
+           // Создание объекта Question
+           Question question = Question(
+             question: data['question'].toString(),
+             answers: List<String>.from(data['answers'] as List<dynamic>),
+             userAnswerIndex: data['userAnswerIndex'] as int,
+           );
+
+           // Добавление в список userResponses
+           userResponses.add(question);
+         }
+       });
+
+       return userResponses;
+     }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +105,6 @@ class _QuestState extends State<Quest> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Анкета'),
-          centerTitle: true,
         ),
         body: Card(
           color: Colors.white60,
@@ -36,6 +112,7 @@ class _QuestState extends State<Quest> {
             itemCount: listQuestion.length,
             itemBuilder: (BuildContext context, int i) {
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     listQuestion[i].question,
@@ -45,18 +122,17 @@ class _QuestState extends State<Quest> {
                       color: Colors.black,
                     ),
                   ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: listQuestion[i].answers.length,
-                    itemBuilder: (BuildContext context, int j) {
+                  Column(
+                    children: List.generate(listQuestion[i].answers.length, (int j)
+                    {
                       return Row(
                         children: [
-                          Checkbox(
-                            value: listQuestion[i].userAnswers[j] ?? false,
-                            onChanged: (bool? value) {
+                          Radio(
+                            value: j,
+                            groupValue: listQuestion[i].userAnswerIndex,
+                            onChanged: (int? value) {
                               setState(() {
-                                listQuestion[i].userAnswers[j] = value;
+                                listQuestion[i].userAnswerIndex = value!;
                               });
                             },
                           ),
@@ -67,23 +143,38 @@ class _QuestState extends State<Quest> {
                         ],
                       );
                     },
+                    ),
                   ),
                 ],
               );
             },
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            List<List<bool?>> userResponses = [];
-            for (var question in listQuestion) {
-              userResponses.add(question.userAnswers);
-            }
-            Navigator.pushNamedAndRemoveUntil (context, '/Hub', (route) => true);
-            // Здесь вы можете провести анализ ответов пользователя, используя список userResponses
-          },
-          backgroundColor: Colors.blue,
-          child: Icon(Icons.arrow_forward),
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  saveUserResponses(listQuestion);
+                  Navigator.pushNamedAndRemoveUntil(context, '/Hub', (route) => true);
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.blue),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Сохранить',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

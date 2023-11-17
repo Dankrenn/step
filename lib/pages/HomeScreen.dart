@@ -1,48 +1,80 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../classes/Complex.dart';
+import 'package:step/classes/Complex.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+class HomeScreen extends StatefulWidget {
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  List<Complex> complexes = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  @override
+  void initState() {
+    super.initState();
+    getComplexFirebase().then((value) {
+      setState(() {
+        complexes = value;
+      });
+    });
+  }
 
-class HomeScreen extends StatelessWidget {
-  List<Complex> complexes = [
-    Complex(
-      name: 'Комплекс 1',
-      injuries: ['Травма 1', 'Травма 2'],
-    ),
-    Complex(
-      name: 'Комплекс 2',
-      injuries: ['Травма 3', 'Травма 4'],
-    ),
-    // Добавьте другие комплексы
-  ];
+  Future<List<Complex>> getComplexFirebase() async {
+    List<Complex> complexs = [];
+    QuerySnapshot querySnapshot = await _firestore.collection('Complex').get();
+    querySnapshot.docs.forEach((doc) {
+      var data = doc.data() as Map<String, dynamic>;
+      if (data['name'] != null && data['injuries'] != null && data['videoUrl'] != null) {
+        Complex complex = Complex(
+          name: data['name'].toString(),
+          injuries: List<String>.from(data['injuries'] as List<dynamic>),
+          videoUrl: data['videoUrl'].toString(),
+        );
+        complexs.add(complex);
+      }
+    });
+    return complexs;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(8, 70, 162, 1),
+      appBar: AppBar(
+        title: Text(
+            'Комплексы'
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView.builder(
           itemCount: complexes.length,
           itemBuilder: (context, index) {
             Complex complex = complexes[index];
-            return Row(
+            String? videoId = complex.videoUrl != null ? YoutubePlayer.convertUrlToId(complex.videoUrl!) : null;
+
+            YoutubePlayerController _controller = YoutubePlayerController(
+              initialVideoId: videoId ?? '',
+              flags: YoutubePlayerFlags(
+                autoPlay: false,
+                mute: false,
+              ),
+            );
+
+            return Column(
               children: [
-                Column(children: [
-                  Text(
-                    complex.name,
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Text(
-                    complex.injuries.join(', '),
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ]),
-                Padding(padding: EdgeInsets.all(30.0),),
-                Container(
-                  height: 150,
-                  width: 150,
-                  color: Colors.blueAccent,
+                Text(
+                  complex.name,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  complex.injuries.join(', '),
+                  style: TextStyle(fontSize: 20),
+                ),
+                YoutubePlayer(
+                  controller: _controller,
+                  showVideoProgressIndicator: true,
                 ),
               ],
             );

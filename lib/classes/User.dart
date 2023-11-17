@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-class User
+class UserApp
 {
 
   int? Id;

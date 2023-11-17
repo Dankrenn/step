@@ -2,8 +2,7 @@
 class Question {
   final String question;
   final List<String> answers;
-  List<bool?> userAnswers;
+  int userAnswerIndex; // Обновлено: убран знак вопроса
 
-  Question({required this.question, required this.answers})
-      : userAnswers = List<bool?>.filled(answers.length, null);
+  Question({required this.question,  required this.answers, this.userAnswerIndex = -1}); // Обновлено: добавлено значение по умолчанию
 }

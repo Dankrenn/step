@@ -1,7 +1,11 @@
 class Complex {
   String name;
   List<String> injuries;
-  // Дополнительные свойства
+  String videoUrl;
 
-  Complex({required this.name, required this.injuries});
+  Complex({
+    required this.name,
+    required this.injuries,
+    required this.videoUrl,
+  });
 }
