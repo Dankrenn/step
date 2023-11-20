@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../classes/User.dart';
 import '../classes/EmailValidator.dart';
+import '../classes/User.dart';
 
 
 class RegistrationScreen extends StatefulWidget {
@@ -15,6 +15,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   bool _isEmailValid = true;
   String _confirmPassword = '';
+  bool showPassword1 = false;
+  bool showPassword2 = false;
 
   bool validateEmail(String email) {
     return EmailValidator.validate(email);
@@ -35,7 +37,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         User? firebaseUser = userCredential.user;
         if (firebaseUser != null) {
           await firebaseUser.updateProfile(displayName: _user.name);
-          Navigator.pushNamedAndRemoveUntil(context, '/Quest', (route) => true);
+          Navigator.pushNamedAndRemoveUntil(context, '/Quest', (route) => false);
         }
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
@@ -98,26 +100,46 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
             SizedBox(height: 16.0),
             TextFormField(
+              obscureText: !showPassword1,
               onChanged: (value) {
                 setState(() {
-                  _user.password = value;
+                  _user.password  = value;
                 });
               },
-              obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Пароль',
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    showPassword1 ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      showPassword1 = !showPassword1;
+                    });
+                  },
+                ),
               ),
             ),
             SizedBox(height: 16.0),
             TextFormField(
+              obscureText: !showPassword2,
               onChanged: (value) {
                 setState(() {
-                  _confirmPassword = value;
+                  _confirmPassword  = value;
                 });
               },
-              obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Повторите пароль',
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    showPassword2 ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      showPassword2 = !showPassword2;
+                    });
+                  },
+                ),
               ),
             ),
             SizedBox(height: 32.0),

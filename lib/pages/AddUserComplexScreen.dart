@@ -36,7 +36,6 @@ class _AddUserComplexScreenState extends State<AddUserComplexScreen> {
     DocumentReference complexDoc = FirebaseFirestore.instance.collection('Complex').doc(complexId);
 
     await complexDoc.set({
-      'id': complexId,
       'name': complexName,
       'videoLink': videoLink,
       'injuries': injuriesList,
@@ -111,7 +110,7 @@ class _AddUserComplexScreenState extends State<AddUserComplexScreen> {
                 String videoLink = videoLinkController.text;
                 List<String> injuriesList = injuries.toList();
                 saveComplexData(complexName,videoLink,injuriesList);
-                Navigator.pushNamedAndRemoveUntil(context, '/Hub', (route) => true);
+                Navigator.pushNamedAndRemoveUntil(context, '/Hub', (route) => false);
               },
               child: Text('Сохранить комплекс'),
             ),

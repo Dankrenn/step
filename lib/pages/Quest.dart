@@ -19,24 +19,23 @@ class _QuestState extends State<Quest> {
      @override
      void initState() {
        super.initState();
-       bool isUserRegistered = FirebaseAuth.instance.currentUser != null;
-       if (isUserRegistered) {
-         getUserResponses().then((value) {
-               setState(() {
-                 listQuestion = value;
-               });
-             });
-           }
-       else {
-         getquestedFirebase().then((questions) {
+       getUserResponses().then((value) {
+         if (value != null && value.length > 0) {
            setState(() {
-             listQuestion = questions;
+             listQuestion = value;
            });
-         });
-       }
+         } else {
+           getQuestedFirebase().then((questions) {
+             setState(() {
+               listQuestion = questions;
+             });
+           });
+         }
+       });
      }
 
-       Future<List<Question>> getquestedFirebase() async {
+
+       Future<List<Question>> getQuestedFirebase() async {
        List<Question> questions = [];
        QuerySnapshot querySnapshot = await _firestore.collection('questions').get();
        querySnapshot.docs.forEach((doc) {
@@ -51,6 +50,8 @@ class _QuestState extends State<Quest> {
        });
        return questions;
      }
+
+
 
      Future<void> saveUserResponses(List<Question> questions) async {
        String userId = FirebaseAuth.instance.currentUser?.uid ?? 'default_uid';
@@ -157,7 +158,7 @@ class _QuestState extends State<Quest> {
               child: ElevatedButton(
                 onPressed: () {
                   saveUserResponses(listQuestion);
-                  Navigator.pushNamedAndRemoveUntil(context, '/Hub', (route) => true);
+                  Navigator.pushNamedAndRemoveUntil(context, '/Hub', (route) => false);
                 },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Colors.blue),

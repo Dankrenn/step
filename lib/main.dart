@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: user != null ? Hub() : AuthorizationScreen(),
+       home: user != null ? Hub() : AuthorizationScreen(),
       routes: {
         '/Authoriz': (context) => AuthorizationScreen(),
         '/Hub': (context) => Hub(),

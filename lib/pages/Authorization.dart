@@ -20,7 +20,7 @@ class _AuthorizState extends State<AuthorizationScreen> {
         password: password,
       );
       // Если аутентификация прошла успешно, переходим на другой экран
-      Navigator.pushNamedAndRemoveUntil(context, '/Hub', (route) => true);
+      Navigator.pushNamedAndRemoveUntil(context, '/Hub', (route) => false);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found' || e.code == 'wrong-password') {
         SnackBar(
@@ -33,7 +33,7 @@ class _AuthorizState extends State<AuthorizationScreen> {
       }
     }
   }
-
+  bool showPassword = false;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -62,7 +62,7 @@ class _AuthorizState extends State<AuthorizationScreen> {
                   ),
                   SizedBox(height: 16.0),
                   TextFormField(
-                    obscureText: true,
+                    obscureText: !showPassword,
                     onChanged: (value) {
                       setState(() {
                         password = value;
@@ -70,6 +70,16 @@ class _AuthorizState extends State<AuthorizationScreen> {
                     },
                     decoration: InputDecoration(
                       labelText: 'Пароль',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          showPassword ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            showPassword = !showPassword;
+                          });
+                        },
+                      ),
                     ),
                   ),
                   SizedBox(height: 32.0),
@@ -89,8 +99,7 @@ class _AuthorizState extends State<AuthorizationScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/Registr', (route) => true);
+                      Navigator.pushNamedAndRemoveUntil(context, '/Registr', (route) => true);
                     },
                     child: Text(
                       'Еще нет аккаунта?',
