@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../classes/EmailValidator.dart';
+
 class AuthorizationScreen extends StatefulWidget {
   const AuthorizationScreen({Key? key}) : super(key: key);
 
@@ -12,13 +14,32 @@ class _AuthorizState extends State<AuthorizationScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late String email;
   late String password;
+  bool _isEmailValid = true;
 
+  bool validateEmail(String email) {
+    return EmailValidator.validate(email);
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(fontSize: 20, color: Colors.red),
+        ),
+        duration: Duration(seconds: 5),
+      ),
+    );
+  }
   void login(BuildContext context) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+      if (!_isEmailValid) {
+        _showSnackBar(context, 'Ошибка: Неправильный формат email!');
+      }
       // Если аутентификация прошла успешно, переходим на другой экран
       Navigator.pushNamedAndRemoveUntil(context, '/Hub', (route) => false);
     } on FirebaseAuthException catch (e) {
@@ -53,6 +74,7 @@ class _AuthorizState extends State<AuthorizationScreen> {
                     keyboardType: TextInputType.emailAddress,
                     onChanged: (value) {
                       setState(() {
+                        _isEmailValid = validateEmail(value);
                         email = value;
                       });
                     },

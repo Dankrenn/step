@@ -3,11 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:step/pages/AddUserComplexScreen.dart';
+import 'package:step/pages/AuthorizationScreen.dart';
+import 'package:step/pages/CalendarScreen.dart';
 import 'package:step/pages/HomeScreen.dart';
-import 'package:step/pages/Hub.dart';
-import 'package:step/pages/Registr.dart';
-import 'package:step/pages/Authorization.dart';
-import 'package:step/pages/Quest.dart';
+import 'package:step/pages/HubScreen.dart';
+import 'package:step/pages/RegistrScreen.dart';
+import 'package:step/pages/QuestScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,8 +51,9 @@ class MyApp extends StatelessWidget {
         '/Hub': (context) => Hub(),
         '/Registr': (context) => RegistrationScreen(),
         '/Quest': (context) => Quest(),
-        '/Hub': (context) => Hub(),
         '/AddComplex': (context) => AddUserComplexScreen(),
+        '/AddComplex': (context) => AddUserComplexScreen(),
+        '/CS': (context) => CalendarScreen(),
         // Другие маршруты
       },
     );

@@ -14,7 +14,7 @@ class ProfileScreen extends StatelessWidget {
         return AlertDialog(
           title: Text('Выйти из учетной записи?'),
           content: Text('Вы уверены, что хотите выйти?'),
-          actions: <Widget>[
+          actions: [
             TextButton(
               child: Text('Да'),
               onPressed: () async{
@@ -41,7 +41,7 @@ class ProfileScreen extends StatelessWidget {
         return AlertDialog(
           title: Text('Удалить учетную запись?'),
           content: Text('Вы уверены, что хотите удалить свою учетную запись? Это действие нельзя будет отменить.'),
-          actions: <Widget>[
+          actions: [
             TextButton(
               child: Text('Да'),
               onPressed: () {
@@ -199,6 +199,28 @@ class ProfileScreen extends StatelessWidget {
                 },
                 child: Text(
                   'Добавить комплекс',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+            ),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pushNamedAndRemoveUntil(context, '/CS', (route) => true);
+                },
+                child: Text(
+                  'Создать уведомления',
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.black,

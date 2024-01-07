@@ -12,21 +12,21 @@ class ChatScreen extends StatelessWidget {
       body: ListView(
         children: [
           ChatTile(
-            photo: Image.network('https://example.com/user1.jpg'),
-            username: 'Пользователь 1',
+            photo: Image.network('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAMM19ibc2ZGK72i5uLElaeQOu33N02S8xeQ&usqp=CAU'),
+            username: 'fillset',
             message: 'Привет, как дела?',
             time: '10:30',
             unreadCount: 2,
           ),
           ChatTile(
-            photo: Image.network('https://example.com/user2.jpg'),
-            username: 'Пользователь 2',
+            photo: Image.network('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAMM19ibc2ZGK72i5uLElaeQOu33N02S8xeQ&usqp=CAU'),
+            username: 'kyki',
             message: 'Привет, что нового?',
             time: '11:15',
             unreadCount: 0,
           ),
           ChatTile(
-            username: 'Пользователь 3',
+            username: 'salam',
             message: 'Привет, давно не виделись!',
             time: '12:00',
             unreadCount: 1,
